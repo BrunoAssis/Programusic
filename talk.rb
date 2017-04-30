@@ -144,15 +144,12 @@ end
 ##| melodia(do_re_mi_fa(dó))
 ##| melodia(do_re_mi_fa(dó + 5))
 
-def partitura(notas, duracoes, bpm = 120, assinatura_tempo = 4/4)
-  tempo_batida = assinatura_tempo / 4
-  bps = bpm / 60.0
-  
+def partitura(notas, duracoes, bpm = 120)
   duracoes_em_segundos = duracoes.map do |duracao|
-    tempo_batida * duracao / bps
+    duracao / bpm.to_f * 60
   end
   
-  notas.zip(duracoes)
+  notas.zip(duracoes_em_segundos)
 end
 
 def frere_jacques(dó)
@@ -186,9 +183,87 @@ def frere_jacques(dó)
     1, 1, 2
   ]
   
-  partitura(notas, duracoes, 80)
+  partitura(notas, duracoes, 110)
 end
 
 ##| puts frere_jacques(dó)
 
-melodia(frere_jacques(dó))
+##| melodia(frere_jacques(dó))
+
+##| melodia(frere_jacques(dó + 5))
+
+def piano(midi, duracao)
+  attack = duracao * 0.05
+  release = duracao * 0.9
+  decay = 0
+  sustain = duracao - release - decay
+  synth :piano,
+    note: midi,
+    attack: attack,
+    decay: decay,
+    release: release,
+    sustain: sustain
+  
+  sleep(duracao)
+end
+
+##| piano(:C4, 1)
+
+def melodia_piano(partituras)
+  clave_sol = partituras.first
+  clave_fa = partituras.last
+  
+  in_thread do
+    clave_sol.each do |tom, duracao|
+      piano(tom, duracao)
+    end
+  end
+  
+  in_thread do
+    clave_fa.each do |tom, duracao|
+      piano(tom, duracao)
+    end
+  end
+end
+
+def eine_kleine_nacht_musik
+  notas_clave_sol = [
+    :G4,   0, :D4, :G4,   0, :D4,
+    :G4, :D4, :G4, :B4, :D5,   0,
+    :C5,   0, :A4, :C5,   0, :A4,
+    :C5, :A4, :F3, :A4, :D3,   0,
+    :G4, :G4, :G4, :B5, :A5, :G4,
+  ]
+  
+  duracoes_clave_sol = [
+    1, 1/2.0, 1/2.0, 1, 1/2.0, 1/2.0,
+    1/2.0, 1/2.0, 1/2.0, 1/2.0, 1, 1,
+    1, 1/2.0, 1/2.0, 1, 1/2.0, 1/2.0,
+    1/2.0, 1/2.0, 1/2.0, 1/2.0, 1, 1,
+    1, 1, 1/2.0, 1/2.0, 1/2.0, 1/2.0,
+  ]
+  
+  notas_clave_fa = [
+    :G3,   0, :D3, :G3,   0, :D3,
+    :G3, :D3, :G3, :B4, :D4,   0,
+    :C4,   0, :A4, :C4,   0, :A4,
+    :C4, :A4, :F3, :A4, :D3,   0,
+    :B4, :B4, :B4, :B4, :B4, :B4, :B4, :B4,
+  ]
+  
+  duracoes_clave_fa = [
+    1, 1/2.0, 1/2.0, 1, 1/2.0, 1/2.0,
+    1/2.0, 1/2.0, 1/2.0, 1/2.0, 1, 1,
+    1, 1/2.0, 1/2.0, 1, 1/2.0, 1/2.0,
+    1/2.0, 1/2.0, 1/2.0, 1/2.0, 1, 1,
+    1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0,
+  ]
+  
+  clave_sol = partitura(notas_clave_sol, duracoes_clave_sol, 125)
+  clave_fa  = partitura(notas_clave_fa, duracoes_clave_fa, 125)
+  [clave_sol, clave_fa]
+end
+
+##| puts eine_kleine_nacht_musik
+
+melodia_piano(eine_kleine_nacht_musik)
