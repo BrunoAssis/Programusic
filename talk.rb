@@ -3,7 +3,7 @@ def tom(frequencia, duracao = 100)
     sustain: duracao, attack: 0, decay: 0, release: 0
 end
 
-# Onda de seno a 440 Hz
+# Onda de seno a 440 Hz (Lá 4).
 ##| tom(440)
 
 # Duas ondas que se somam.
@@ -14,8 +14,12 @@ end
 ##| tom(440)
 ##| tom(440.5)
 
-# Onda com duração curta
+# Onda com duração curta.
 ##| tom(440, 1)
+
+# O Lá 4 vira o Lá 5 se dobrarmos a frequência.
+##| tom(440,1)
+##| tom(880,1)
 
 def tom_envelopado(frequencia, duracao = 100)
   attack = duracao * 0.05
@@ -108,6 +112,10 @@ def pentatonica(base)
   escala(base, [3, 2, 2, 3, 2])
 end
 
+def egipcia(base)
+  escala(base, [2, 3, 2, 3, 2])
+end
+
 def cromatica(base)
   escala(base, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
 end
@@ -115,7 +123,23 @@ end
 ##| melodia_simples(menor(dó))
 ##| melodia_simples(blues(dó))
 ##| melodia_simples(pentatonica(dó))
+##| melodia_simples(egipcia(dó))
 ##| melodia_simples(cromatica(dó))
+
+def melodia_aleatoria(tons, duracao_total, pausa = 0.3)
+  duracao = 0.0
+  while duracao < duracao_total
+    tom = tons.sample
+    nota(tom, pausa)
+    duracao += pausa
+  end
+end
+
+##| melodia_aleatoria(cromatica(dó), 6)
+##| melodia_aleatoria(maior(dó), 6)
+##| melodia_aleatoria(menor(dó), 6)
+##| melodia_aleatoria(pentatonica(dó), 6)
+##| melodia_aleatoria(egipcia(dó), 6)
 
 def melodia(tons_duracoes)
   tons_duracoes.each do |tom, duracao|
@@ -154,12 +178,8 @@ end
 
 def frere_jacques(dó)
   escala_maior = maior(dó)
-  ré = escala_maior[1]
-  mi = escala_maior[2]
-  fá = escala_maior[3]
-  sol = escala_maior[4]
-  la = escala_maior[5]
-  sol3 = dó - 5
+  dó, ré, mi, fá, sol, la = escala_maior
+  sol3 = sol - 12
   
   notas = [
     dó, ré, mi, dó,
@@ -266,4 +286,4 @@ end
 
 ##| puts eine_kleine_nacht_musik
 
-melodia_piano(eine_kleine_nacht_musik)
+##| melodia_piano(eine_kleine_nacht_musik)
