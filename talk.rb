@@ -1,3 +1,7 @@
+#######################
+# Como funciona o som #
+#######################
+
 def tom(frequencia, duracao = 100)
   synth :sine, note: hz_to_midi(frequencia),
     sustain: duracao, attack: 0, decay: 0, release: 0
@@ -17,22 +21,36 @@ end
 # Onda com duração curta.
 ##| tom(440, 1)
 
-# O Lá 4 vira o Lá 5 se dobrarmos a frequência.
-##| tom(440,1)
-##| tom(880,1)
+######################################################
+# Relação entre as notas musicais e suas frequências #
+######################################################
+
+# O Lá 4 vira o Lá 5 se dobrarmos a frequência :O
+##| tom(440, 1)
+##| tom(880, 1)
+
+######################################
+# O que são Envelopes? Envelope ADSR #
+######################################
 
 def tom_envelopado(frequencia, duracao = 100)
   attack = duracao * 0.05
-  release = duracao * 0.9
   decay = 0
+  release = duracao * 0.9
   sustain = duracao - release - decay
   synth :sine,
     note: hz_to_midi(frequencia),
     attack: attack,
     decay: decay,
-    release: release,
-    sustain: sustain
+    sustain: sustain,
+    release: release
 end
+
+##| tom_envelopado(440, 3)
+
+####################################
+# Construindo um instrumento: Sino #
+####################################
 
 def sino(frequencia = 440,
          duracao = 6,
@@ -44,23 +62,28 @@ def sino(frequencia = 440,
   end
 end
 
-# Sino padrão
+# Sino padrão.
 ##| sino(300)
 
-# Sino com série harmônica mais realista
+# Sino com série harmônica mais realista.
 ##| sino(300, 6, {1 => 1, 2 => 0.6, 3 => 0.4, 4.2 => 0.25, 5.4 => 0.2, 6.8 => 0.15})
 
-# ... e mais agudo
+# ... e mais agudo.
 ##| sino(600, 6, {1 => 1, 2 => 0.6, 3 => 0.4, 4.2 => 0.25, 5.4 => 0.2, 6.8 => 0.15})
 
-# Com séries harmônicas de duração diferente
+# Com séries harmônicas de duração diferente.
 ##| sino(500, 6, {1 => 0, 2 => 0.6, 3 => 0.4, 4.2 => 0.25, 5.4 => 0.2, 6.8 => 0.15})
 ##| sino(400, 6, {1 => 0, 2 => 0, 3 => 0.4, 4.2 => 0.25, 5.4 => 0.2, 6.8 => 0.15})
+
+#############################################################
+# Introdução ao MIDI - Musical Instrument Digital Interface #
+#############################################################
 
 def midi_para_hz(midi)
   8.1757989156 * (2 ** (midi / 12.0))
 end
 
+##| puts hz_to_midi(440)
 ##| puts midi_para_hz(69)
 
 def campainha(midi)
@@ -69,10 +92,16 @@ end
 
 ##| campainha(69)
 
+##############################################################
+# Músicas são compostas por intervalos de som e de silêncio. #
+##############################################################
+
 def nota(tom, pausa)
   campainha(tom)
   sleep(pausa)
 end
+
+##| nota(69, 2)
 
 def melodia_simples(tons, pausa = 0.5)
   tons.each do |tom|
@@ -82,6 +111,11 @@ end
 
 ##| melodia_simples(70..77)
 ##| melodia_simples([77, 76, 75, 74, 73, 72, 71, 70])
+##| melodia_simples([70, 71, 72, 73, 74, 75, 76, 77, 76, 75, 74, 73, 72, 71, 70])
+
+###########
+# Escalas #
+###########
 
 def escala(base, intervalos)
   passo = 0
@@ -97,8 +131,16 @@ end
 
 ##| puts maior(70)
 
-dó = 60
+######################################################
+# Melodia simples: com pausas fixas entre cada nota. #
+######################################################
+
+dó = 60 # com acento porque 'do' é palavra reservada :P
 ##| melodia_simples(maior(dó))
+
+##############################################################
+# Outras escalas: Menor, Blues, Penta, Egípcia, Cromática... #
+##############################################################
 
 def menor(base)
   escala(base, [2, 1, 2, 2, 1, 2, 2])
@@ -126,6 +168,10 @@ end
 ##| melodia_simples(egipcia(dó))
 ##| melodia_simples(cromatica(dó))
 
+###############################################
+# Melodias aleatórias usando as escalas acima #
+###############################################
+
 def melodia_aleatoria(tons, duracao_total, pausa = 0.3)
   duracao = 0.0
   while duracao < duracao_total
@@ -140,6 +186,10 @@ end
 ##| melodia_aleatoria(menor(dó), 6)
 ##| melodia_aleatoria(pentatonica(dó), 6)
 ##| melodia_aleatoria(egipcia(dó), 6)
+
+#############################################################################
+# Uma melodia mais próxima da real, com notas e pausas de tamanhos variados #
+#############################################################################
 
 def melodia(tons_duracoes)
   tons_duracoes.each do |tom, duracao|
@@ -164,9 +214,19 @@ def do_re_mi_fa(base)
 end
 
 ##| puts do_re_mi_fa(dó)
-
 ##| melodia(do_re_mi_fa(dó))
+
+
+######################################################
+# Se mudarmos a base, a relação matemática continua. #
+######################################################
+
+##| puts do_re_mi_fa(dó + 5)
 ##| melodia(do_re_mi_fa(dó + 5))
+
+##########################
+# O que é uma partitura? #
+##########################
 
 def partitura(notas, duracoes, bpm = 120)
   duracoes_em_segundos = duracoes.map do |duracao|
@@ -179,7 +239,7 @@ end
 def frere_jacques(dó)
   escala_maior = maior(dó)
   dó, ré, mi, fá, sol, la = escala_maior
-  sol3 = sol - 12
+  sol3 = sol - 12 # descendo uma escala: existem 12 notas entre uma nota e sua oitava
   
   notas = [
     dó, ré, mi, dó,
@@ -206,11 +266,17 @@ def frere_jacques(dó)
   partitura(notas, duracoes, 110)
 end
 
+#####################################
+# Frère Jacques - ou, MEU LANCHINHO #
+#####################################
+
 ##| puts frere_jacques(dó)
-
 ##| melodia(frere_jacques(dó))
-
 ##| melodia(frere_jacques(dó + 5))
+
+#######################
+# Chegamos no Mozart. #
+#######################
 
 def piano(midi, duracao)
   attack = duracao * 0.05
@@ -229,6 +295,10 @@ end
 
 ##| piano(:C4, 1)
 
+########################################################################################
+# Eine Kleine Nachtmusik: veja que a partitura de piano toca duas mãos simultaneamente #
+########################################################################################
+
 def melodia_piano(partituras)
   clave_sol = partituras.first
   clave_fa = partituras.last
@@ -246,7 +316,7 @@ def melodia_piano(partituras)
   end
 end
 
-def eine_kleine_nacht_musik
+def eine_kleine_nachtmusik
   notas_clave_sol = [
     :G4,   0, :D4, :G4,   0, :D4,
     :G4, :D4, :G4, :B4, :D5,   0,
@@ -284,6 +354,5 @@ def eine_kleine_nacht_musik
   [clave_sol, clave_fa]
 end
 
-##| puts eine_kleine_nacht_musik
-
-##| melodia_piano(eine_kleine_nacht_musik)
+##| puts eine_kleine_nachtmusik
+##| melodia_piano(eine_kleine_nachtmusik)
