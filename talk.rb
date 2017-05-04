@@ -28,6 +28,7 @@ end
 # O Lá 4 vira o Lá 5 se dobrarmos a frequência :O
 ##| tom(440, 1)
 ##| tom(880, 1)
+##| tom(220, 1)
 
 ######################################
 # O que são Envelopes? Envelope ADSR #
@@ -90,7 +91,7 @@ def campainha(midi)
   sino(midi_para_hz(midi), 3, {1 => 0, 2 => 0, 3 => 0.4, 4.2 => 0.25, 5.4 => 0.2, 6.8 => 0.15})
 end
 
-##| campainha(69)
+##| campainha(64)
 
 ##############################################################
 # Músicas são compostas por intervalos de som e de silêncio. #
@@ -117,16 +118,16 @@ end
 # Escalas #
 ###########
 
-def escala(base, intervalos)
+def escala(tonica, intervalos)
   passo = 0
-  [base] + intervalos.map do |intervalo|
+  [tonica] + intervalos.map do |intervalo|
     passo += intervalo
-    base + passo
+    tonica + passo
   end
 end
 
-def maior(base)
-  escala(base, [2, 2, 1, 2, 2, 2, 1])
+def maior(tonica)
+  escala(tonica, [2, 2, 1, 2, 2, 2, 1])
 end
 
 ##| puts maior(70)
@@ -142,24 +143,24 @@ dó = 60 # com acento porque 'do' é palavra reservada :P
 # Outras escalas: Menor, Blues, Penta, Egípcia, Cromática... #
 ##############################################################
 
-def menor(base)
-  escala(base, [2, 1, 2, 2, 1, 2, 2])
+def menor(tonica)
+  escala(tonica, [2, 1, 2, 2, 1, 2, 2])
 end
 
-def blues(base)
-  escala(base, [3, 2, 1, 1, 3, 2])
+def blues(tonica)
+  escala(tonica, [3, 2, 1, 1, 3, 2])
 end
 
-def pentatonica(base)
-  escala(base, [3, 2, 2, 3, 2])
+def pentatonica(tonica)
+  escala(tonica, [3, 2, 2, 3, 2])
 end
 
-def egipcia(base)
-  escala(base, [2, 3, 2, 3, 2])
+def egipcia(tonica)
+  escala(tonica, [2, 3, 2, 3, 2])
 end
 
-def cromatica(base)
-  escala(base, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+def cromatica(tonica)
+  escala(tonica, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
 end
 
 ##| melodia_simples(menor(dó))
@@ -197,7 +198,7 @@ def melodia(tons_duracoes)
   end
 end
 
-def do_re_mi_fa(base)
+def do_re_mi_fa(tonica)
   notas = [
     0, 2, 4, 5, 5, 5,
     0, 2, 0, 2, 2, 2,
@@ -210,7 +211,7 @@ def do_re_mi_fa(base)
     0.25, 0.25, 0.25, 0.4, 0.25, 0.5,
     0.25, 0.25, 0.25, 0.4, 0.25, 0.5
   ]
-  notas.map{|nota| base + nota}.zip(duracoes)
+  notas.map{|nota| tonica + nota}.zip(duracoes)
 end
 
 ##| puts do_re_mi_fa(dó)
@@ -221,8 +222,8 @@ end
 # Se mudarmos a base, a relação matemática continua. #
 ######################################################
 
-##| puts do_re_mi_fa(dó + 5)
-##| melodia(do_re_mi_fa(dó + 5))
+##| puts do_re_mi_fa(dó - 10)
+##| melodia(do_re_mi_fa(dó - 10))
 
 ##########################
 # O que é uma partitura? #
@@ -272,7 +273,7 @@ end
 
 ##| puts frere_jacques(dó)
 ##| melodia(frere_jacques(dó))
-##| melodia(frere_jacques(dó + 5))
+##| melodia(frere_jacques(dó - 10))
 
 #######################
 # Chegamos no Mozart. #
@@ -318,11 +319,15 @@ end
 
 def eine_kleine_nachtmusik
   notas_clave_sol = [
-    :G4,   0, :D4, :G4,   0, :D4,
-    :G4, :D4, :G4, :B4, :D5,   0,
-    :C5,   0, :A4, :C5,   0, :A4,
-    :C5, :A4, :F3, :A4, :D3,   0,
+    :G4, nil, :D4, :G4, nil, :D4,
+    :G4, :D4, :G4, :B4, :D5, nil,
+    :C5, nil, :A4, :C5, nil, :A4,
+    :C5, :A4, :F3, :A4, :D3, nil,
     :G4, :G4, :G4, :B5, :A5, :G4,
+    
+    :G4, :F4, :F4, :A5, :C5, :F4,
+    :A5, :G4, :G4, :B5, :A5, :G4,
+    :G4, :F4, :F4, :A5, :C5, :F4,
   ]
   
   duracoes_clave_sol = [
@@ -331,14 +336,20 @@ def eine_kleine_nachtmusik
     1, 1/2.0, 1/2.0, 1, 1/2.0, 1/2.0,
     1/2.0, 1/2.0, 1/2.0, 1/2.0, 1, 1,
     1, 1, 1/2.0, 1/2.0, 1/2.0, 1/2.0,
+    
+    1/2.0, 1/2.0, 3/2.0, 1/2.0, 1/2.0, 1/2.0,
+    1/2.0, 1/2.0, 3/2.0, 1/2.0, 1/2.0, 1/2.0,
+    1/2.0, 1/2.0, 3/2.0, 1/2.0, 1/2.0, 1/2.0,
   ]
   
   notas_clave_fa = [
-    :G3,   0, :D3, :G3,   0, :D3,
-    :G3, :D3, :G3, :B4, :D4,   0,
-    :C4,   0, :A4, :C4,   0, :A4,
-    :C4, :A4, :F3, :A4, :D3,   0,
+    :G3, nil, :D3, :G3, nil, :D3,
+    :G3, :D3, :G3, :B4, :D4, nil,
+    :C4, nil, :A4, :C4, nil, :A4,
+    :C4, :A4, :F3, :A4, :D3, nil,
     :B4, :B4, :B4, :B4, :B4, :B4, :B4, :B4,
+
+    :C4, :C4, :C4, :C4, :C4, :C4, :C4, :C4,
   ]
   
   duracoes_clave_fa = [
@@ -346,6 +357,8 @@ def eine_kleine_nachtmusik
     1/2.0, 1/2.0, 1/2.0, 1/2.0, 1, 1,
     1, 1/2.0, 1/2.0, 1, 1/2.0, 1/2.0,
     1/2.0, 1/2.0, 1/2.0, 1/2.0, 1, 1,
+    1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0,
+    
     1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0, 1/2.0,
   ]
   
